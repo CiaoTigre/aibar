@@ -65,12 +65,11 @@ const char * Response_2_noSound[]  	=
 	"我好像没有听见你说话"
 };
 
-// 门禁 socket
 #define __ENTRANCE_GUARD_THREAD
 #define ENTRANCE_GUARD
 #ifdef ENTRANCE_GUARD
 /**
- * Range of Temp. considered： ---
+ * Entrance guard monitoring robot - Voice response
  */
 class EntranceGuard{  
 public:   
