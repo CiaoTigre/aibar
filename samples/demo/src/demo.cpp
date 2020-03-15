@@ -767,7 +767,8 @@ void* _getTemperature(void *arg){
 
 	int sockfd;
     char SOCK_PATH[108] = "/tmp/entryInfo.sock";
-    if((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0){
+CONNECT_AGAIN:
+	if((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0){
         perror("socket");
         exit(EXIT_FAILURE);
     }
@@ -777,9 +778,12 @@ void* _getTemperature(void *arg){
     servaddr.sun_family = AF_UNIX;
     strcpy(servaddr.sun_path, SOCK_PATH);
 
+
     if(connect(sockfd, (struct sockaddr* )&servaddr, sizeof(servaddr)) < 0){
         perror("connect");
-        exit(EXIT_FAILURE);
+		usleep(1000*3000);
+		goto CONNECT_AGAIN;
+        // exit(EXIT_FAILURE);
     }
 
     char buf[BUF_SIZE + 1];
@@ -790,16 +794,25 @@ void* _getTemperature(void *arg){
 		
  		nbuf = recv(sockfd, buf, BUF_SIZE, 0);
         buf[nbuf] = 0;
-		strcpy(entranceGuard.Json, buf); 
+		usleep(1000*100); //100ms 
 
-		cout << ">> Json: " << entranceGuard.Json << endl;
-		// usleep(1000*10); //10ms 
-
-		entranceGuard.generateResp(Resp);
-		cout << left << setw(15) << ">> Resp: " << Resp << endl;
+		if(nbuf <= 0){
+			usleep(1000*1000);
+			goto CONNECT_AGAIN;
+		}
+		else
+		{
+			strcpy(entranceGuard.Json, buf); 
+			cout << ">> Json: " << entranceGuard.Json << endl;
+			
+			entranceGuard.generateResp(Resp);
+			cout << left << setw(15) << ">> Resp: " << Resp << endl;
+			
+			SpeechSynthesis((char*)Resp.data());
+			playSound(wavpath);
+		}
 		
-        SpeechSynthesis((char*)Resp.data());
-        playSound(wavpath);
+		
 	}
 }
 #endif /** ENTRANCE_GUARD */

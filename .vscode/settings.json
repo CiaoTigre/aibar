@@ -2,6 +2,7 @@
     "files.associations": {
         "ostream": "cpp",
         "iostream": "cpp",
-        "speech_recognizer.h": "c"
+        "speech_recognizer.h": "c",
+        "string": "cpp"
     }
 }
